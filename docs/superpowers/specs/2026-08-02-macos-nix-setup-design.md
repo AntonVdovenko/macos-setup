@@ -81,10 +81,48 @@ under `hosts/`. Adding a second Mac is one new file plus one line in `flake.nix`
 | `dotfiles/vscode/settings.json` | `~/Library/Application Support/Code/User/settings.json` | **copy** (writable) |
 | `dotfiles/vscode/keybindings.json` | `~/Library/Application Support/Code/User/keybindings.json` | **copy** (writable) |
 | `dotfiles/vscode/extensions.txt` | — | consumed by `just sync-vscode-extensions` |
+| pinned tmux plugins (see below) | `~/.tmux/plugins/`, `~/.config/tmux/plugins/` | fetched by Nix, symlinked |
 
 Symlinked files are read-only Nix store paths; editing them means editing the repo
 and rebuilding. The two VS Code files are copied precisely so they stay writable —
 see "The VS Code sync loop".
+
+### tmux plugins
+
+`tmux.conf` is deployed verbatim, but it is inert without its plugins, and those
+are not self-installing. Two distinct mechanisms are in play on the source
+machine:
+
+- Four plugins are declared with `set -g @plugin` and installed by TPM into
+  `~/.tmux/plugins/`.
+- Catppuccin is **not** TPM-managed. It is loaded by a bare
+  `run ~/.config/tmux/plugins/catppuccin/catppuccin.tmux` line with no `@plugin`
+  declaration, so `prefix + I` does not install it. On a fresh machine that `run`
+  line fails and the status bar renders raw `#{E:@catppuccin_status_*}`
+  placeholders instead of a theme.
+
+All six are therefore fetched by Nix at pinned revisions and placed at the exact
+paths `tmux.conf` already references. This keeps `tmux.conf` verbatim, removes
+`prefix + I` from the bootstrap, and pins plugin versions — TPM would otherwise
+clone current `master` and give a new Mac newer plugins than this one.
+
+| Plugin | Rev | Tag | Destination |
+| --- | --- | --- | --- |
+| catppuccin/tmux | `8b0b915` | latest | `~/.config/tmux/plugins/catppuccin` |
+| tmux-plugins/tpm | `99469c4` | v3.0.0 | `~/.tmux/plugins/tpm` |
+| tmux-plugins/tmux-sensible | `25cb91f` | v3.0.0 | `~/.tmux/plugins/tmux-sensible` |
+| tmux-plugins/tmux-resurrect | `cff343c` | v4.0.0 | `~/.tmux/plugins/tmux-resurrect` |
+| tmux-plugins/tmux-continuum | `0698e8f` | v3.1.0 | `~/.tmux/plugins/tmux-continuum` |
+| tmux-plugins/tmux-yank | `acfd36e` | v2.3.0 | `~/.tmux/plugins/tmux-yank` |
+
+TPM is still deployed because `tmux.conf` ends with `run '~/.tmux/plugins/tpm/tpm'`
+and that line stays verbatim. TPM loads plugins already present on disk without
+writing to them, so read-only store paths are fine; only `prefix + I` writes, and
+it is no longer needed.
+
+Saved session layouts under `~/.local/share/tmux/resurrect` are runtime state, not
+configuration, and are not carried over. A new Mac starts with no restored
+sessions.
 
 ### Repo layout
 
@@ -217,6 +255,7 @@ Three levels, none of which is "it built, so it works":
    - every declared cask is present in `/Applications`
    - every declared CLI resolves on `PATH`
    - every symlinked target in the deployment table resolves into the Nix store
+   - all six tmux plugin directories exist, including the non-TPM Catppuccin one
    - the two copied VS Code files differ from `dotfiles/vscode/` only in ways you
      have not yet synced — reported as a diff, not an error
    - the installed VS Code extension set matches `extensions.txt`
@@ -240,8 +279,8 @@ Handled by `MANUAL.md`, not by this repo:
 
 SSH private keys; AWS, kube and gcloud credentials; `gh auth login`; application
 sign-ins and licences; iCloud and Apple ID state; browser profiles; the ~25
-undeclared `/Applications` entries; tmux plugin installation via TPM (first-run
-`prefix + I`).
+undeclared `/Applications` entries; saved tmux session layouts under
+`~/.local/share/tmux/resurrect`.
 
 ## Risks
 
