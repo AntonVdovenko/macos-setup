@@ -17,7 +17,8 @@
 - `dotfiles/` content is byte-identical to the source machine. Do not reformat, re-indent, or "improve" those files.
 - Only four deviations from the source machine are permitted, all listed in the spec: gcloud from nixpkgs instead of `~/Downloads`, no Framework Python alias, no `~/.local/bin` hand-installs, and removal of the inert p10k/starship configs.
 - Two corrections to the spec's package list, both made deliberately during planning: `libpq` is dropped because `postgresql_14` already provides `pg_config` and the client libraries and installing both collides in the profile; `mole` is added to `homebrew.brews` because it is installed on the source machine, is macOS-specific, and is not in nixpkgs — the spec's list omitted it.
-- Do NOT run `darwin-rebuild switch` on this machine during Tasks 1–12. Every verification uses `nix build` / `nix eval`, which do not touch the running system. Activation is Task 13 and is separately gated.
+- **The user has instructed that this work must not change or delete anything on their Mac (stated 2026-08-02).** Task 13 is therefore CANCELLED, not merely gated. Do not run `darwin-rebuild switch`. Do not modify, move or delete any file under `$HOME` outside this repo. Do not install or uninstall Homebrew packages.
+- Every verification uses `nix build` / `nix eval`, which only write to `/nix/store` and leave the running system's configuration untouched. Build outputs go to the session scratchpad, never into `$HOME` or the repo.
 - Commit after every task.
 
 ## File Structure
@@ -81,12 +82,12 @@ This creates a `/nix` volume, a daemon, and build users. **Ask the user before r
 curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --no-confirm
 ```
 
-Upstream Nix is the default. `--determinate` is an opt-in boolean flag that takes no value — passing it would install Determinate Nix, which manages `/etc/nix/nix.conf` itself and fights nix-darwin's `nix.*` options. Do not pass it. (`--determinate=false` is a parse error, not a way to opt out.)
+**This installs Determinate Nix regardless of flags.** Verified on 2026-08-02: `--determinate=false` is a parse error (the flag takes no value), and omitting the flag entirely still produced `Determinate Nix 3.21.9`. The installer no longer ships upstream Nix. The consequence is that `darwin/default.nix` must set `nix.enable = false` — see Task 3.
 
 - [ ] **Step 4: Verify Nix works in a fresh shell**
 
 Run: `zsh -lc 'nix --version && nix flake --help >/dev/null && echo FLAKES_OK'`
-Expected: a version line (2.x) followed by `FLAKES_OK`. If `nix: command not found`, the daemon shell hook has not loaded — open a new terminal.
+Expected: a version line followed by `FLAKES_OK`. If `nix: command not found`, the shell has not picked up `/etc/zshrc`'s daemon hook — prefix commands with `PATH="/nix/var/nix/profiles/default/bin:$PATH"` or open a new terminal.
 
 - [ ] **Step 5: Commit**
 
@@ -250,12 +251,11 @@ git commit -m "Capture dotfiles verbatim from VdovenkoAnton"
 
   users.users.${host.username}.home = "/Users/${host.username}";
 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  nix.gc = {
-    automatic = true;
-    interval = { Weekday = 0; Hour = 3; Minute = 0; };
-    options = "--delete-older-than 30d";
-  };
+  # Determinate Nix owns /etc/nix/nix.conf and runs its own daemon
+  # (determinate-nixd), so nix-darwin must not manage Nix. This also rules out
+  # nix.settings and nix.gc — Determinate handles GC, and nix-command/flakes are
+  # already enabled in its config.
+  nix.enable = false;
 
   # Sudo via Touch ID. Approved addition, not present on the source machine.
   security.pam.services.sudo_local.touchIdAuth = true;
@@ -1269,7 +1269,16 @@ Expected: the repo exists with the chosen visibility, and `origin/main` carries 
 
 ---
 
-### Task 13: Activate on this Mac (OPTIONAL — requires explicit user approval)
+### Task 13: Activate on this Mac — CANCELLED
+
+**The user instructed on 2026-08-02 that this work must not change anything on their Mac. This task is cancelled. Do not execute it.** It is kept below only as a record of what activation would involve, for whenever they choose to adopt the config — most likely on the new machine rather than this one.
+
+The consequence to be honest about: Tasks 1–12 prove the configuration *builds* and that its outputs are byte-correct. They cannot prove it *activates* cleanly, because activation is the one thing being withheld. First activation on the new Mac may surface issues — most likely Homebrew declining to adopt an already-installed app, or a home-manager refusal to overwrite an existing dotfile (mitigated by `backupFileExtension`).
+
+<details>
+<summary>Original task, retained for reference</summary>
+
+### Task 13: Activate (OPTIONAL — requires explicit user approval)
 
 **Files:**
 - None created.
@@ -1339,3 +1348,5 @@ git push
 - **The build/eval distinction is the safety property.** `nix build` and `nix eval` construct store paths and change nothing about the running machine. `darwin-rebuild switch` is the only command that mutates it, and it appears exactly once, in the gated Task 13.
 - **Hash harvesting in Task 9 is expected to fail repeatedly.** That is the workflow, not a problem. Nix reports one mismatched hash per build.
 - **When a check fails, report the output.** Several verification steps are designed to fail before their implementation lands. Distinguish "failed as expected" from "failed unexpectedly" and never paper over the second.
+
+</details>

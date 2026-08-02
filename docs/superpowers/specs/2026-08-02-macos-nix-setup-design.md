@@ -238,9 +238,23 @@ just sync-vscode-extensions
 open MANUAL.md
 ```
 
-Upstream Nix is used rather than Determinate Nix. Determinate manages
-`/etc/nix/nix.conf` itself, which conflicts with nix-darwin's `nix.*` options and
-requires `nix.enable = false` — an extra failure mode for a first setup.
+**Determinate Nix, not upstream.** This was decided by the installer, not by
+preference. As of 2026 the Determinate Systems installer ships only Determinate
+Nix; `--determinate` is an opt-in flag that takes no value, and omitting it no
+longer yields upstream Nix. Verified on 2026-08-02: a plain
+`sh -s -- install --no-confirm` produced `Determinate Nix 3.21.9`.
+
+The consequence is mandatory: Determinate owns `/etc/nix/nix.conf` (the file
+declares "do not modify! this file will be replaced!"), runs its own daemon via
+`determinate-nixd`, and reserves `/etc/nix/nix.custom.conf` for user settings.
+nix-darwin must therefore set `nix.enable = false`, which also means nix-darwin
+does not manage `nix.settings` or `nix.gc` — Determinate handles garbage
+collection itself, and `nix-command`/`flakes` are already enabled in its config.
+
+Installing upstream Nix instead would mean uninstalling and reinstalling through a
+different installer. That is not worth doing: `nix.enable = false` is a supported
+nix-darwin configuration, and everything this repo needs from nix-darwin — macOS
+defaults, Homebrew, home-manager — is unaffected.
 
 Expected wall clock: 30–40 minutes, dominated by downloads. Subsequent rebuilds
 use `just switch`.
