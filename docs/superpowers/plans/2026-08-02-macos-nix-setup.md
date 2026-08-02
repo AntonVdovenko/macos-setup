@@ -677,7 +677,7 @@ cat /tmp/hm/home-files/.zshrc
 ```bash
 Z=/tmp/hm/home-files/.zshrc
 grep -q 'config-tmux.json'          "$Z" && echo "ok   tmux prompt variant"
-grep -q "alias ll='eza --long -a'"  "$Z" && echo "ok   ll alias"
+grep -q "alias -- ll='eza --long -a'" "$Z" && echo "ok   ll alias"   # note: home-manager emits `alias -- name=value`
 grep -q 'zoxide init zsh'           "$Z" && echo "ok   zoxide"
 grep -q 'oh-my-zsh.sh'              "$Z" && echo "ok   oh-my-zsh"
 grep -q 'Downloads/google-cloud-sdk' "$Z" && echo "FAIL Downloads gcloud leaked" || echo "ok   no Downloads gcloud"
