@@ -78,10 +78,10 @@ Rebuilt in full by `just switch`. See `MANUAL.md` for the steps Nix cannot do.
 This creates a `/nix` volume, a daemon, and build users. **Ask the user before running it.** If they decline, stop — Tasks 3 onward cannot be verified without it.
 
 ```bash
-curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --no-confirm --determinate=false
+curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --no-confirm
 ```
 
-`--determinate=false` selects upstream Nix. Determinate Nix manages `/etc/nix/nix.conf` itself, which fights nix-darwin's `nix.*` options.
+Upstream Nix is the default. `--determinate` is an opt-in boolean flag that takes no value — passing it would install Determinate Nix, which manages `/etc/nix/nix.conf` itself and fights nix-darwin's `nix.*` options. Do not pass it. (`--determinate=false` is a parse error, not a way to opt out.)
 
 - [ ] **Step 4: Verify Nix works in a fresh shell**
 
@@ -1127,7 +1127,7 @@ home-manager for the user environment, Homebrew for GUI apps.
 
 ```sh
 xcode-select --install
-curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --determinate=false
+curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --no-confirm
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 git clone https://github.com/AntonVdovenko/macos-setup ~/Workspace/Nix/macos_setup
 cd ~/Workspace/Nix/macos_setup
