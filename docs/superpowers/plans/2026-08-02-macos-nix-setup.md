@@ -990,12 +990,14 @@ echo "== Homebrew casks =="
 BREWFILE=$(nix eval --raw .#darwinConfigurations.VdovenkoAnton.config.homebrew.brewfile 2>/dev/null)
 if [ -n "$BREWFILE" ]; then
   installed=$(brew list --cask 2>/dev/null)
+  # $BREWFILE holds the Brewfile CONTENT, not a store path — nix-darwin's
+  # config.homebrew.brewfile evaluates to the text itself.
   # Process substitution, not a pipe: a piped `while` runs in a subshell and
   # its FAIL=1 would be discarded, making every cask failure invisible.
   while read -r c; do
     short="${c##*/}"
     if echo "$installed" | grep -qx "$short"; then ok "$short"; else bad "$short not installed"; fi
-  done < <(grep '^cask "' "$BREWFILE" | sed 's/^cask "\(.*\)".*/\1/')
+  done < <(printf '%s\n' "$BREWFILE" | grep '^cask "' | sed 's/^cask "\([^"]*\)".*/\1/')
 else
   bad "could not evaluate the Brewfile"
 fi
