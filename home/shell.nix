@@ -42,6 +42,7 @@
     # not add it automatically when Determinate Nix owns the daemon and
     # `nix.enable = false`.
     "/etc/profiles/per-user/${host.username}/bin"
+    "$HOME/.local/bin"
     "$HOME/go/bin"
   ];
 }
