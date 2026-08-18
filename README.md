@@ -11,6 +11,7 @@ curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix 
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 git clone https://github.com/AntonVdovenko/macos-setup ~/Workspace/Nix/macos_setup
 cd ~/Workspace/Nix/macos_setup
+./scripts/configure-host.sh
 sudo /nix/var/nix/profiles/default/bin/nix run nix-darwin -- switch --flake .#VdovenkoAnton
 just sync-vscode-extensions
 just doctor
@@ -18,6 +19,8 @@ just doctor
 
 The first activation intentionally invokes Nix directly because it installs
 both `darwin-rebuild` and `just`; neither needs to be installed by hand.
+`configure-host.sh` detects the current account, home directory, and Mac
+architecture. macOS computer and network names remain under company control.
 
 Then work through `MANUAL.md` for the things Nix cannot do.
 

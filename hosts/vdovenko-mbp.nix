@@ -5,5 +5,6 @@
   # names are preserved on every laptop.
   hostname = "VdovenkoAnton";
   username = "visenze";
+  homeDirectory = "/Users/visenze";
   system = "aarch64-darwin";
 }

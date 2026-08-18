@@ -10,7 +10,7 @@
   system.primaryUser = host.username;
   system.stateVersion = 6;
 
-  users.users.${host.username}.home = "/Users/${host.username}";
+  users.users.${host.username}.home = host.homeDirectory;
 
   # Determinate Nix owns /etc/nix/nix.conf (the file is stamped "do not modify!
   # this file will be replaced!") and runs its own daemon, determinate-nixd.
