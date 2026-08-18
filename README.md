@@ -16,6 +16,9 @@ just sync-vscode-extensions
 just doctor
 ```
 
+The first activation intentionally invokes Nix directly because it installs
+both `darwin-rebuild` and `just`; neither needs to be installed by hand.
+
 Then work through `MANUAL.md` for the things Nix cannot do.
 
 Expect 30–40 minutes, most of it downloads.

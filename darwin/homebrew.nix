@@ -27,7 +27,6 @@
       "dbeaver-community"
       "orbstack"
       "nikitabobko/tap/aerospace"
-      "rectangle"
       # Cask name is "hiddenbar", not "hidden-bar". Note this installs the
       # GitHub release; the source machine's copy came from the App Store.
       "hiddenbar"
