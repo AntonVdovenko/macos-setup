@@ -8,7 +8,7 @@ cd "$(dirname "$0")/.."
 # System and Home Manager profiles may not be on PATH in a non-login shell.
 export PATH="/etc/profiles/per-user/$(id -un)/bin:/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin:$PATH"
 
-HOSTCFG="VdovenkoAnton"
+HOSTCFG="macbook"
 
 FAIL=0
 ok()   { printf '  \033[32mok\033[0m    %s\n' "$1"; }
@@ -18,7 +18,12 @@ warn() { printf '  \033[33mwarn\033[0m  %s\n' "$1"; }
 echo "== Homebrew casks =="
 # NOTE: config.homebrew.brewfile evaluates to the Brewfile CONTENT, not a store
 # path. Do not try to cat it.
-BREWFILE=$(nix eval --raw ".#darwinConfigurations.${HOSTCFG}.config.homebrew.brewfile" 2>/dev/null)
+if [ ! -f hosts/local.nix ]; then
+  bad "hosts/local.nix missing; run ./scripts/configure-host.sh"
+  BREWFILE=""
+else
+  BREWFILE=$(nix eval --raw "path:.#darwinConfigurations.${HOSTCFG}.config.homebrew.brewfile" 2>/dev/null)
+fi
 if [ -n "$BREWFILE" ]; then
   installed=$(brew list --cask 2>/dev/null)
   # Process substitution, not a pipe: a piped `while` runs in a subshell and its

@@ -2,6 +2,7 @@ result
 result-*
 .DS_Store
 .direnv/
+hosts/local.nix
 
 # Superpowers workflow artifacts — kept locally, not published
 docs/superpowers/

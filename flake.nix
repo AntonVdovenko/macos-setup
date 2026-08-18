@@ -15,10 +15,15 @@
 
   outputs = inputs @ { self, nixpkgs, nix-darwin, home-manager }:
     let
-      host = import ./hosts/vdovenko-mbp.nix;
+      # `path:.` includes the ignored machine-local file. Pure Git evaluation
+      # falls back to the neutral template so CI can still evaluate the flake.
+      hostFile = if builtins.pathExists ./hosts/local.nix
+        then ./hosts/local.nix
+        else ./hosts/template.nix;
+      host = import hostFile;
     in
     {
-      darwinConfigurations.${host.hostname} = nix-darwin.lib.darwinSystem {
+      darwinConfigurations.${host.configuration} = nix-darwin.lib.darwinSystem {
         inherit (host) system;
         specialArgs = { inherit inputs host; };
         modules = [
