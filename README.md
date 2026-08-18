@@ -11,7 +11,7 @@ curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix 
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 git clone https://github.com/AntonVdovenko/macos-setup ~/Workspace/Nix/macos_setup
 cd ~/Workspace/Nix/macos_setup
-nix run nix-darwin -- switch --flake .#VdovenkoAnton
+sudo /nix/var/nix/profiles/default/bin/nix run nix-darwin -- switch --flake .#VdovenkoAnton
 just sync-vscode-extensions
 just doctor
 ```

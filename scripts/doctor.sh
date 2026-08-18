@@ -5,8 +5,8 @@ set -uo pipefail
 
 cd "$(dirname "$0")/.."
 
-# nix may not be on PATH in a non-login shell.
-export PATH="/nix/var/nix/profiles/default/bin:$PATH"
+# System and Home Manager profiles may not be on PATH in a non-login shell.
+export PATH="/etc/profiles/per-user/$(id -un)/bin:/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin:$PATH"
 
 HOSTCFG="VdovenkoAnton"
 

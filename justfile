@@ -5,7 +5,14 @@ default:
 
 # Build and apply the configuration.
 switch:
-    sudo darwin-rebuild switch --flake .#{{host}}
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if command -v darwin-rebuild >/dev/null 2>&1; then
+      sudo darwin-rebuild switch --flake .#{{host}}
+    else
+      # Bootstrap: darwin-rebuild is installed by the first activation.
+      sudo /nix/var/nix/profiles/default/bin/nix run nix-darwin -- switch --flake .#{{host}}
+    fi
 
 # Build without applying. Run this before switch.
 build:

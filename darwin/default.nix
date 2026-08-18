@@ -7,8 +7,8 @@
 
   nixpkgs.hostPlatform = host.system;
 
-  networking.hostName = host.hostname;
-  networking.computerName = host.hostname;
+  networking.hostName = host.hostName;
+  networking.computerName = host.computerName;
 
   system.primaryUser = host.username;
   system.stateVersion = 6;

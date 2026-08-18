@@ -2,10 +2,11 @@
 {
   programs.git = {
     enable = true;
-    userName = "Anton";
-    userEmail = "vdovenkoantono@gmail.com";
-
-    extraConfig = {
+    settings = {
+      user = {
+        name = "Anton";
+        email = "vdovenkoantono@gmail.com";
+      };
       core.autocrlf = "input";
       init.defaultBranch = "main";
       pull.rebase = true;
@@ -15,7 +16,7 @@
 
   # gitCredentialHelper is on by default and writes the credential.helper
   # entries for github.com and gist.github.com itself — setting them by hand in
-  # extraConfig above collides with it and fails to evaluate.
+  # settings above collides with it and fails to evaluate.
   #
   # It emits the same two-entry form the source machine has (an empty helper to
   # reset, then the gh helper), but pointing at the nix-store gh rather than the
