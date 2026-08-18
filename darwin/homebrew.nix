@@ -35,7 +35,11 @@
       "font-jetbrains-mono"
       "font-meslo-lg-nerd-font"
 
-      # AI & comms
+      # AI CLIs
+      "codex"
+      "claude-code"
+
+      # AI desktop apps & comms
       "claude"
       "chatgpt"
       "slack"
