@@ -32,7 +32,6 @@ Client, VLC, Folx, Google Chrome, Cursor, Portal, Wallspace, Syncthing.
 - [ ] Displays, Night Shift, hot corners
 - [ ] Grant Accessibility permission to AeroSpace on first launch
       (System Settings → Privacy & Security → Accessibility)
-- [ ] Grant Accessibility permission to Rectangle on first launch
 
 ## First-run notes
 

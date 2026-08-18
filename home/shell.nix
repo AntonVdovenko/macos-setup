@@ -1,4 +1,4 @@
-{ ... }:
+{ host, ... }:
 {
   programs.zsh = {
     enable = true;
@@ -38,6 +38,11 @@
   # would rebind Ctrl-R and change how the shell behaves.
 
   home.sessionPath = [
+    # useUserPackages installs the Home Manager profile here. nix-darwin does
+    # not add it automatically when Determinate Nix owns the daemon and
+    # `nix.enable = false`.
+    "/etc/profiles/per-user/${host.username}/bin"
+    "$HOME/.local/bin"
     "$HOME/go/bin"
   ];
 }

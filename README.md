@@ -1,7 +1,7 @@
 # macOS setup
 
-Declarative macOS configuration for `VdovenkoAnton`: nix-darwin for the system,
-home-manager for the user environment, Homebrew for GUI apps.
+Portable declarative macOS configuration: nix-darwin for the system,
+home-manager for the user environment, and Homebrew for apps.
 
 ## Fresh machine
 
@@ -11,10 +11,18 @@ curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix 
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 git clone https://github.com/AntonVdovenko/macos-setup ~/Workspace/Nix/macos_setup
 cd ~/Workspace/Nix/macos_setup
-nix run nix-darwin -- switch --flake .#VdovenkoAnton
+./scripts/configure-host.sh
+sudo /nix/var/nix/profiles/default/bin/nix run nix-darwin -- switch --flake path:.#macbook
 just sync-vscode-extensions
 just doctor
 ```
+
+The first activation intentionally invokes Nix directly because it installs
+both `darwin-rebuild` and `just`; neither needs to be installed by hand.
+`configure-host.sh` detects the current account, home directory, and Mac
+architecture and writes them to the Git-ignored `hosts/local.nix`. The
+`path:.` flake reference makes that local file visible to Nix without ever
+committing it. macOS computer and network names remain under company control.
 
 Then work through `MANUAL.md` for the things Nix cannot do.
 

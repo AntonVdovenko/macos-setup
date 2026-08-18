@@ -1,19 +1,29 @@
-host := "VdovenkoAnton"
+host := "macbook"
 
 default:
     @just --list
 
 # Build and apply the configuration.
 switch:
-    sudo darwin-rebuild switch --flake .#{{host}}
+    #!/usr/bin/env bash
+    set -euo pipefail
+    [ -f hosts/local.nix ] || { echo "run ./scripts/configure-host.sh first" >&2; exit 1; }
+    if command -v darwin-rebuild >/dev/null 2>&1; then
+      sudo darwin-rebuild switch --flake path:.#{{host}}
+    else
+      # Bootstrap: darwin-rebuild is installed by the first activation.
+      sudo /nix/var/nix/profiles/default/bin/nix run nix-darwin -- switch --flake path:.#{{host}}
+    fi
 
 # Build without applying. Run this before switch.
 build:
-    nix build .#darwinConfigurations.{{host}}.system --no-link
+    @test -f hosts/local.nix || { echo "run ./scripts/configure-host.sh first" >&2; exit 1; }
+    nix build path:.#darwinConfigurations.{{host}}.system --no-link
 
 # Evaluate the flake for errors.
 check:
-    nix flake check
+    @test -f hosts/local.nix || { echo "run ./scripts/configure-host.sh first" >&2; exit 1; }
+    nix flake check path:.
 
 # Update all flake inputs.
 update:
